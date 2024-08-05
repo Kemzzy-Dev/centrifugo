@@ -26,10 +26,14 @@ jobs:
           npm install --include=dev
 
       - name: Build project
-        run: npm run build
+        run: |
+          cd backend
+          npm run build
 
       - name: Run tests
-        run: npm run test
+        run: |
+          cd backend
+          npm run test
 
   deploy-main:
     runs-on: ubuntu-latest
