@@ -1,7 +1,7 @@
 {
   "apps": [
     {
-      "name": "centrifugo",
+      "name": "centrifugo-backend",
       "script": "npm run start:prod",
       "log_file": "~/.pm2/logs/centrifugo-out.log",
       "combine_logs": true,
