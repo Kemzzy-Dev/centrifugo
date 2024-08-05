@@ -14,8 +14,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        with:
-          path: backend
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -23,7 +21,9 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
-        run: npm install --include=dev
+        run: |
+          cd backend
+          npm install --include=dev
 
       - name: Build project
         run: npm run build
