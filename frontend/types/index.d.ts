@@ -35,3 +35,9 @@ export type UserType = {
 }
 
 
+export interface messageType {
+    message: string,
+    userId: string,
+    roomId: string
+    created_at: string
+  }

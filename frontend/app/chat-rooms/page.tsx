@@ -24,12 +24,7 @@ interface messageType {
   created_at: string
 }
 
-const testMessage: messageType = {
-  message: "hello there my guy",
-  userId: "",
-  roomId: '',
-  created_at: "2024-08-05T02:25:20.746Z"
-}
+
 
 
 
@@ -86,17 +81,9 @@ export default function ChatRoom() {
     const MessageProcessor = new SocketManager()
 
     async function processMessage() {
-      console.log(messageQueue)
+      console.log("messageQueue => ",messageQueue)
       const message = messageQueue[0]
       const { type, body} = message[0]
-
-      // dispatch({
-      //   type: "ADD_MESSAGES",
-      //   payload: {
-      //     roomId: rooms,
-      //     messages: [message]
-      //   }
-      // })
       
       switch (type) {
         case 'message_added': {
@@ -119,42 +106,29 @@ export default function ChatRoom() {
       setMessageQueue(prev => prev.slice(1))
     }
 
-    processMessage()
+    // processMessage()
 
   },[messageQueue,chatStateHandler])
 
 
-  useEffect(() => {
-        
-    let centrifuge: Centrifuge | null = null
-    const init = async () => {
-        centrifuge = new Centrifuge(`ws://${appConfig.socketUrl}`,{
-            debug: true,
-            getToken: getToken
-        })
+  useEffect(() => {  
+      let centrifuge: Centrifuge | null = null
+      const init = async () => {
+          centrifuge = new Centrifuge(`ws://${appConfig.socketUrl}`,{
+              debug: true,
+              getToken: getToken
+          })
 
-        const rooms: RoomType[] = await getRooms(user.access_token)
-        
-        // dispatch({
-        //   type: "INSTANTIATE_MESSAGES",
-        //   payload: {
-        //     rooms: rooms
-        //   }
-        // })
-
-        dispatch({
-          type: "ADD_MESSAGES",
-          payload: {
-            roomId: "15776996-e299-4d08-938e-177540c64f8c",
-            messages: [testMessage]
-          }
-        })
-    }
+          const rooms: RoomType[] = await getRooms(user.access_token)
+          
+          dispatch({
+            type: "INSTANTIATE_MESSAGES",
+            payload: {
+              rooms: rooms
+            }
+          })   
+        }
         init()
-        const payload = testMessage
-        payload.userId = user.email,
-
-        
 
         centrifuge!.connect()
 
@@ -223,7 +197,7 @@ export default function ChatRoom() {
         </ul>
       </div>
       <div className="w-full">
-        <CustomerChat currentUser={user.email} roomMessages={chatStateHandler.messagesByRoomId[roomId]} roomId={roomId} />
+        <CustomerChat action={dispatch} currentUser={user.email} roomMessages={chatStateHandler.messagesByRoomId[roomId]} roomId={roomId} />
       </div>
     </main>
   );

@@ -27,16 +27,16 @@ export const emptyContext = {
 }
 
 export default function AuthContext({children} :Props) {
-    const defaultUserContext = localStorage.getItem('userContext') ? JSON.parse(localStorage.getItem('userContext')!) : emptyContext
-    const [user,setUserContext] = useState<UserContext>(defaultUserContext)
+    // const defaultUserContext = localStorage.getItem('userContext') ? JSON.parse(localStorage.getItem('userContext')!) : emptyContext
+    const [user,setUserContext] = useState<UserContext>(emptyContext)
     const router = useRouter()
 
-    // useEffect(() => {
-    //     const storedUserContext = localStorage.getItem('userContext');
-    //     if (storedUserContext) {
-    //       setUserContext(JSON.parse(storedUserContext));
-    //     }
-    //   }, []);
+    useEffect(() => {
+        const storedUserContext = localStorage.getItem('userContext');
+        if (storedUserContext) {
+          setUserContext(JSON.parse(storedUserContext));
+        }
+      }, []);
       
     useEffect(() => {
         if (!user.access_token) {

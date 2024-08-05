@@ -121,9 +121,19 @@ export function reducer(state: any, action: any) {
         const newMessages = action.payload.messages;
 
         let currentMessages = state.messagesByRoomId[roomId] || [];
-
+        console.log("Current Messages => ",currentMessages)
         const combinedMessages = [...currentMessages, ...newMessages]
-        console.log(combinedMessages)
+        const allMessages = state.messagesByRoomId
+        allMessages[roomId] = combinedMessages
+
+        // console.log("combinedMessages", combinedMessages) // array of object
+        
+        
+        // const messagesByRoomId = combinedMessages.reduce<MessagesByRoomsById>((acc, message: MessageType) => {
+        //   acc[message.id] = message;
+        //   return acc;
+        // }, {});
+
         // Combine current and new messages, then filter out duplicates.
         // const combinedMessages = [...currentMessages, ...newMessages].filter(
         //   (message, index, self) =>
@@ -153,12 +163,13 @@ export function reducer(state: any, action: any) {
   
         return {
           ...state,
-          messagesByRoomId: {
-            ...state.messagesByRoomId,
-            [roomId]: combinedMessages
-          },
-          roomsById: [],
-          rooms: state.updatedRooms,
+          messagesByRoomId: allMessages,
+          // {
+          //   ...state.messagesByRoomId,
+          //   [roomId]: combinedMessages
+          // },
+          roomsById: state.roomsById,
+          rooms: state.rooms,
         };
       }
 

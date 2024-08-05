@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react';
+import React, { Dispatch, useEffect, useState } from 'react';
 import InputEmoji from "react-input-emoji";
 import { ArrowUp } from 'lucide-react'
 import { roomMessages } from '../data';
@@ -10,7 +10,7 @@ import { useAuthContext } from '@/context/AuthContext';
 
 
 
-const CustomerChat = ({ roomId, roomMessages, currentUser }: { roomId: string, roomMessages: MessageType[], currentUser: string }) => {
+const CustomerChat = ({ roomId, roomMessages, currentUser, action }: { roomId: string, roomMessages: MessageType[], currentUser: string, action: Dispatch<any> }) => {
   const [text, setText] = useState('');
   const {user} = useAuthContext()
 
@@ -21,7 +21,6 @@ const CustomerChat = ({ roomId, roomMessages, currentUser }: { roomId: string, r
 useEffect(() => {
 
 },[roomId])
-
 
 
 
@@ -56,8 +55,24 @@ useEffect(() => {
   )
 
   const handleOnEnter = async () => {
-    const payload = {message: text}
-    await sendMessage(payload,user.access_token)
+    const currentDate = new Date();
+    const now = currentDate.toISOString();
+
+    const testMessage = {
+      content: text,
+      created_at: now,
+      user: {
+        email: currentUser
+      }
+    }
+
+    action({
+      type: "ADD_MESSAGES",
+      payload: {
+        roomId,
+        messages: [testMessage]
+      }
+    })
   }
 
 
