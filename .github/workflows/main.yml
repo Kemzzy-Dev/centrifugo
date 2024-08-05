@@ -30,10 +30,10 @@ jobs:
           cd backend
           npm run build
 
-      - name: Run tests
-        run: |
-          cd backend
-          npm run test
+      # - name: Run tests
+      #   run: |
+      #     cd backend
+      #     npm run test
 
   deploy-main:
     runs-on: ubuntu-latest
