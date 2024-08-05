@@ -31,6 +31,13 @@ export default function AuthContext({children} :Props) {
     const [user,setUserContext] = useState<UserContext>(defaultUserContext)
     const router = useRouter()
 
+    // useEffect(() => {
+    //     const storedUserContext = localStorage.getItem('userContext');
+    //     if (storedUserContext) {
+    //       setUserContext(JSON.parse(storedUserContext));
+    //     }
+    //   }, []);
+      
     useEffect(() => {
         if (!user.access_token) {
             router.push('/')

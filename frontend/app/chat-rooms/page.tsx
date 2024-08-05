@@ -24,6 +24,13 @@ interface messageType {
   created_at: string
 }
 
+const testMessage: messageType = {
+  message: "hello there my guy",
+  userId: "",
+  roomId: '',
+  created_at: "2024-08-05T02:25:20.746Z"
+}
+
 
 
 
@@ -83,13 +90,13 @@ export default function ChatRoom() {
       const message = messageQueue[0]
       const { type, body} = message[0]
 
-      dispatch({
-        type: "ADD_MESSAGES",
-        payload: {
-          roomId: rooms,
-          messages: [message]
-        }
-      })
+      // dispatch({
+      //   type: "ADD_MESSAGES",
+      //   payload: {
+      //     roomId: rooms,
+      //     messages: [message]
+      //   }
+      // })
       
       switch (type) {
         case 'message_added': {
@@ -127,15 +134,27 @@ export default function ChatRoom() {
         })
 
         const rooms: RoomType[] = await getRooms(user.access_token)
+        
+        // dispatch({
+        //   type: "INSTANTIATE_MESSAGES",
+        //   payload: {
+        //     rooms: rooms
+        //   }
+        // })
 
         dispatch({
-          type: "INSTANTIATE_MESSAGES",
+          type: "ADD_MESSAGES",
           payload: {
-            rooms: rooms
+            roomId: "15776996-e299-4d08-938e-177540c64f8c",
+            messages: [testMessage]
           }
         })
     }
         init()
+        const payload = testMessage
+        payload.userId = user.email,
+
+        
 
         centrifuge!.connect()
 
@@ -192,7 +211,7 @@ export default function ChatRoom() {
       <div className="w-[30%] bg-gray-200 h-screen p-4 border-r border-gray-300">
         <h2 className="text-lg font-semibold mb-4">Chat Rooms</h2>
         <ul>
-          {chatStateHandler.rooms.map((room: RoomType) => (
+          {chatStateHandler.rooms?.map((room: RoomType) => (
             <li
               onClick={() => setRoomId(room.id)}
               key={room.id}
