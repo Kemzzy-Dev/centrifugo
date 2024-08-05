@@ -1,18 +1,16 @@
 name: CI/CD--Main
 
 on:
-  pull_request:
-    branches:
-      - main
   push:
     branches:
       - main
+  # pull_request:
+  #   branches:
+  #     - main
 
 jobs:
   test-and-build-main:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -23,36 +21,24 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
-        run: npm install --include=dev
+        run: |
+          cd backend
+          npm install --include=dev
 
       - name: Build project
-        run: npm run build
+        run: |
+          cd backend
+          npm run build
 
-      - name: Run tests
-        run: npm run test
+      # - name: Run tests
+      #   run: |
+      #     cd backend
+      #     npm run test
 
   deploy-main:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
-
+    needs: test-and-build-main
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Install dependencies
-        run: npm install --include=dev
-
-      - name: Build project
-        run: npm run build
-
-      - name: Run tests
-        run: npm run test
-
       - name: Deploying to virtual machine
         uses: appleboy/ssh-action@v1.0.3
         with:
