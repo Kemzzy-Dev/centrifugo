@@ -57,7 +57,7 @@ useEffect(() => {
 
   const handleOnEnter = async () => {
     const payload = {message: text}
-     await sendMessage(payload,user.access_token)
+    await sendMessage(payload,user.access_token)
   }
 
 
