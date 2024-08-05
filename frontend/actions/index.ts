@@ -50,8 +50,8 @@ export async function getCentrifugeToken(token: string): Promise<GetTokenRespons
 }
 
 
-async function sendMessage (payload: any,token: string) {
-  const request =  await fetch(`${API_URL}/rooms/:room_id`,{
+export async function sendMessage (payload: any,token: string) {
+  const request =  await fetch(`${API_URL}/rooms/:room_id/message`,{
     headers: {
         "Authorization": `Bearer ${token}`
     },
@@ -66,7 +66,7 @@ export async function getRooms (token: string) {
     }
 })
 const response = await request.json()
-console.log(response)
+
   return response.data
 }
 
@@ -88,6 +88,9 @@ export async function signUp(payload: CreateUserDTO): Promise<AuthResponseDto> {
     return ErrorResponse
   }
 }
+
+
+
 
 
 const ErrorResponse = {

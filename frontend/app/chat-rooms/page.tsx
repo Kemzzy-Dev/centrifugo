@@ -17,6 +17,14 @@ const initialChatState: InitialStateType = {
   messagesByRoomId: {}
 };
 
+interface messageType {
+  message: string,
+  userId: string,
+  roomId: string
+  created_at: string
+}
+
+
 
 
 export default function ChatRoom() {
@@ -32,6 +40,8 @@ export default function ChatRoom() {
   const [messageQueue, setMessageQueue] = useState<any[]>([])
   const [chatStateHandler, dispatch] = useReducer(reducer,initialChatState)
   
+
+  console.log(chatStateHandler)
   class SocketManager {
     public async processUserJoined(body: any) {}
 
@@ -72,6 +82,14 @@ export default function ChatRoom() {
       console.log(messageQueue)
       const message = messageQueue[0]
       const { type, body} = message[0]
+
+      dispatch({
+        type: "ADD_MESSAGES",
+        payload: {
+          roomId: rooms,
+          messages: [message]
+        }
+      })
       
       switch (type) {
         case 'message_added': {
@@ -108,13 +126,12 @@ export default function ChatRoom() {
             getToken: getToken
         })
 
-        const rooms = await getRooms(user.access_token)
-        console.log(user.access_token)
-        console.log(rooms)
+        const rooms: RoomType[] = await getRooms(user.access_token)
+
         dispatch({
-          type: "SET_ROOM",
+          type: "INSTANTIATE_MESSAGES",
           payload: {
-            room: rooms
+            rooms: rooms
           }
         })
     }
@@ -123,6 +140,7 @@ export default function ChatRoom() {
         centrifuge!.connect()
 
         const personalChannel = "personal:"+ user.email
+
         async function getPersonalChannelSubscriptionToken() {
             return await getChannelSubscriptionToken({channelTitle:personalChannel, token: user.access_token})
         }
@@ -186,7 +204,7 @@ export default function ChatRoom() {
         </ul>
       </div>
       <div className="w-full">
-        <CustomerChat roomId={roomId} />
+        <CustomerChat currentUser={user.email} roomMessages={chatStateHandler.messagesByRoomId[roomId]} roomId={roomId} />
       </div>
     </main>
   );
