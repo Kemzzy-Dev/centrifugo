@@ -134,8 +134,7 @@ export default class UserService {
     currentRoom.members = [...roomMembers, newMember];
     const room = await this.roomRepository.save(currentRoom);
     const channels = await this.getRoomMembers(roomId);
-    console.log('joined')
-    console.log(channels)
+    
     const broadcastPayload = {
       channels: channels,
       data: {
@@ -224,8 +223,11 @@ export default class UserService {
         },
         idempotency_key: `messsage_${newMessage.id}`,
       };
-
-      await this.broadcastService.broadcastRoom(roomId, broadcastPayload);
+      try {
+        await this.broadcastService.broadcastRoom(roomId, broadcastPayload);
+      } catch (error) {
+        console.log("CreateMessage: ",error)
+      }
 
       return {
         status_code: 200,
