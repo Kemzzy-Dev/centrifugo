@@ -195,7 +195,7 @@ export default class UserService {
   }
 
   public async getRoomMembers(roomId: string) {
-    const members = (await this.getRoom(roomId)). members
+    const members = (await this.getRoom(roomId)).members
     console.log("Members ",members)
     const result = members.map(member => `personal:${member.email}`);
     return result;
