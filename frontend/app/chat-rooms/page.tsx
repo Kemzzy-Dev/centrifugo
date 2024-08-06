@@ -132,7 +132,7 @@ export default function ChatRoom() {
   useEffect(() => {  
       let centrifuge: Centrifuge | null = null
       const init = async () => {
-          centrifuge = new Centrifuge(`ws://${appConfig.socketUrl}`,{
+          centrifuge = new Centrifuge(`${appConfig.socketUrl}`,{
               debug: true,
               getToken: getToken
           })
