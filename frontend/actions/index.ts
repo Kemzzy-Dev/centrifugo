@@ -1,6 +1,7 @@
 "use server"
 
 import appConfig from "@/config/appConfig"
+import { SendMessagePayload } from "@/types"
 
 
 
@@ -19,7 +20,7 @@ export async function login(payload: LoginPayload): Promise<AuthResponseDto> {
         body: JSON.stringify(payload)
     })
     const response = await request.json()
-    console.log(response)
+
     return response
 }
 
@@ -50,14 +51,20 @@ export async function getCentrifugeToken(token: string): Promise<GetTokenRespons
 }
 
 
-export async function sendMessage (payload: any,token: string) {
-  const request =  await fetch(`${API_URL}/rooms/:room_id/message`,{
+export async function sendMessage (payload: SendMessagePayload) {
+  const request =  await fetch(`${API_URL}/rooms/${payload.roomId}/message`,{
     headers: {
-        "Authorization": `Bearer ${token}`
+        "Authorization": `Bearer ${payload.token}`,
+        'Content-Type': "application/json"
+
     },
-    body: JSON.stringify(payload)
-})
+    body: JSON.stringify({message: payload.message}),
+    method: 'POST'
+  })
+  const response = await request.json()
+  return response
 }
+
 
 export async function getRooms (token: string) {
   const request =  await fetch(`${API_URL}/rooms/`,{
@@ -66,10 +73,35 @@ export async function getRooms (token: string) {
     }
 })
 const response = await request.json()
-
-  return response.data
+console.log(response)
+  return response
 }
 
+export async function joinRoom (token: string,roomId: string) {
+  const request =  await fetch(`${API_URL}/rooms/${roomId}/join`,{
+    headers: {
+        "Authorization": `Bearer ${token}`,
+        'Content-Type': "application/json"
+    },
+    method: "POST"
+})
+const response = await request.json()
+console.log(response)
+  return response
+}
+
+
+export async function leaveRoom (token: string,roomId: string) {
+  const request =  await fetch(`${API_URL}/rooms/${roomId}/leave`,{
+    headers: {
+        "Authorization": `Bearer ${token}`
+    },
+    method: "POST"
+  })
+  const response = await request.json()
+  console.log(response)
+  return response
+}
 
 
 export async function signUp(payload: CreateUserDTO): Promise<AuthResponseDto> {

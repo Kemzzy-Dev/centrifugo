@@ -7,10 +7,10 @@ type Props = {
 }
 
 
-type UserContext = {
+export type UserContext = {
     access_token: string
     email: string,
-    username: string
+    id: string
 }
 
 type UserContextType = {
@@ -23,24 +23,26 @@ const ContextProvider = createContext<UserContextType | null>(null)
 export const emptyContext = {
     access_token: "",
     email: "",
-    username: ""
+    id: ""
 }
 
 export default function AuthContext({children} :Props) {
-    // const defaultUserContext = localStorage.getItem('userContext') ? JSON.parse(localStorage.getItem('userContext')!) : emptyContext
-    const [user,setUserContext] = useState<UserContext>(emptyContext)
+    const defaultUserContext = localStorage.getItem('userContext') ? JSON.parse(localStorage.getItem('userContext')!) : emptyContext
+    const [user,setUserContext] = useState<UserContext>(defaultUserContext)
     const router = useRouter()
 
-    useEffect(() => {
-        const storedUserContext = localStorage.getItem('userContext');
-        if (storedUserContext) {
-          setUserContext(JSON.parse(storedUserContext));
-        }
-      }, []);
+    // useEffect(() => {
+    //     const storedUserContext = localStorage.getItem('userContext');
+    //     if (storedUserContext) {
+    //       setUserContext(JSON.parse(storedUserContext));
+    //     }
+    //   }, []);
       
     useEffect(() => {
         if (!user.access_token) {
+            console.log("Missing token")
             router.push('/')
+            return
         }
     },[])
 

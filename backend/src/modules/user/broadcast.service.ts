@@ -20,7 +20,9 @@ export class BroadcastService {
         },
         body: JSON.stringify(broadcastPayload),
       });
-      // const response = await request.body;
+      const response = await request.json();
+      console.log(response.result)
+      console.log("broadcast complete")
       this.logger.log(`Broadcast to room ${roomId} successful, response: `);
     } catch (error) {
       console.log('Error: ', error);

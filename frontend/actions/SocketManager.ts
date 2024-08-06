@@ -30,22 +30,65 @@ export function reducer(state: any, action: any) {
         return initialChatState;
       }
 
-      case 'ADD_ROOMS': {
-        const newRooms = action.payload.rooms;
-  
-        // Update roomsById with new rooms, avoiding duplicates.
-        const updatedRoomsById = { ...state.roomsById };
-        newRooms.forEach((room: any) => {
-          if (!updatedRoomsById[room.id]) {
-            updatedRoomsById[room.id] = room;
+      case 'LEAVE_ROOM': {
+    
+        const payload: RoomType = action.payload.rooms[0];
+        const rooms: RoomType[] = state.rooms
+        const updatedRooms: RoomType[] =  rooms.map(room => {
+          if (room.id === payload.id) {
+            return payload
           }
+          return room;
         });
+
+        const messagesByRoomId = updatedRooms.reduce<MessagesByRoomsById>((acc, room: RoomType) => {
+          const messages = [...room.messages]
+          messages.reverse()
+          acc[room.id] = messages;
+          return acc;
+        }, {});
+
+        const roomsById = updatedRooms.reduce<RoomsById>((acc, room: RoomType) => {
+          acc[room.id] = room;
+          return acc;
+        }, {});
   
   
         return {
-          ...state,
-          roomsById: updatedRoomsById,
-          rooms: newRooms
+          messagesByRoomId,
+          roomsById,
+          rooms,
+        };
+      }
+      
+
+      case 'JOIN_ROOM': {
+        const payload: RoomType = action.payload.rooms[0];
+        const rooms: RoomType[] = state.rooms
+        const updatedRooms: RoomType[] =  rooms.map(room => {
+          if (room.id === payload.id) {
+            return payload
+          }
+          return room;
+        });
+
+        const messagesByRoomId = updatedRooms.reduce<MessagesByRoomsById>((acc, room: RoomType) => {
+          const messages = [...room.messages]
+          messages.reverse()
+          acc[room.id] = messages;
+          return acc;
+        }, {});
+
+        const roomsById = updatedRooms.reduce<RoomsById>((acc, room: RoomType) => {
+          acc[room.id] = room;
+          return acc;
+        }, {});
+  
+  
+        return {
+          messagesByRoomId,
+          roomsById,
+          rooms,
         };
       }
 
@@ -70,34 +113,12 @@ export function reducer(state: any, action: any) {
         };
       }
 
-
-      case 'DELETE_ROOM': {
-        const roomId = action.payload.roomId;
-  
-        // Set the specified room to null instead of deleting it.
-        const newRoomsById = {
-          ...state.roomsById,
-          [roomId]: null // On delete we set roomId to null. This allows to sync membership state of rooms on ChatSearch screen.
-        };
-  
-        // Remove the room from the rooms array.
-        const newRooms = state.rooms.filter((id: any) => id !== roomId);
-  
-        // Remove associated messages.
-        const { [roomId]: deletedMessages, ...newMessagesByRoomId } = state.messagesByRoomId;
-  
-        return {
-          ...state,
-          roomsById: newRoomsById,
-          rooms: newRooms,
-          messagesByRoomId: newMessagesByRoomId
-        };
-      }
-
       case 'INSTANTIATE_MESSAGES': {
         const rooms: RoomType[] = action.payload.rooms;
         const messagesByRoomId = rooms.reduce<MessagesByRoomsById>((acc, room: RoomType) => {
-          acc[room.id] = room.messages;
+          const messages = [...room.messages]
+          messages.reverse()
+          acc[room.id] = messages;
           return acc;
         }, {});
 
@@ -121,53 +142,20 @@ export function reducer(state: any, action: any) {
         const newMessages = action.payload.messages;
 
         let currentMessages = state.messagesByRoomId[roomId] || [];
-        console.log("Current Messages => ",currentMessages)
-        const combinedMessages = [...currentMessages, ...newMessages]
-        const allMessages = state.messagesByRoomId
-        allMessages[roomId] = combinedMessages
-
-        // console.log("combinedMessages", combinedMessages) // array of object
-        
-        
-        // const messagesByRoomId = combinedMessages.reduce<MessagesByRoomsById>((acc, message: MessageType) => {
-        //   acc[message.id] = message;
-        //   return acc;
-        // }, {});
-
-        // Combine current and new messages, then filter out duplicates.
-        // const combinedMessages = [...currentMessages, ...newMessages].filter(
-        //   (message, index, self) =>
-        //     index === self.findIndex(m => m.id === message.id)
-        // );
-          
-        // console.log("Combined: ",combinedMessages)
-        // // Sort the combined messages by id in ascending order.
-        // combinedMessages.sort((a, b) => a.id - b.id);
-  
-        // // Find the message with the highest ID.
-        // const maxMessageId = combinedMessages.length > 0 ? combinedMessages[combinedMessages.length - 1].id : null;
-  
-        // let needSort = false;
-  
-        // // Update the roomsById object with the new last_message if necessary.
-        // const updatedRoomsById = { ...state.roomsById };
-        // // if (maxMessageId !== null && updatedRoomsById[roomId] && (!updatedRoomsById[roomId].last_message || maxMessageId > updatedRoomsById[roomId].last_message.id)) {
-        // //   const newLastMessage = combinedMessages.find(message => message.id === maxMessageId);
-        // //   updatedRoomsById[roomId].last_message = newLastMessage;
-        // //   updatedRoomsById[roomId].bumped_at = newLastMessage.room.bumped_at;
-        // //   needSort = true;
-        // // }
-  
-        // let updatedRooms = [...state.rooms];
-        
+     
+        const combinedMessages = [...currentMessages, ...newMessages].filter(
+          (message, index, self) =>
+            index === self.findIndex(m => m.created_at === message.created_at)
+        );
+                 
   
         return {
           ...state,
-          messagesByRoomId: allMessages,
-          // {
-          //   ...state.messagesByRoomId,
-          //   [roomId]: combinedMessages
-          // },
+          messagesByRoomId:
+          {
+            ...state.messagesByRoomId,
+            [roomId]: combinedMessages
+          },
           roomsById: state.roomsById,
           rooms: state.rooms,
         };

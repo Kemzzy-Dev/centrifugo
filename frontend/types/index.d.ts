@@ -9,6 +9,12 @@ export type RoomType = {
     messages: MessageType[]
     }
 
+export interface SendMessagePayload {
+    message: string
+    token: string
+    roomId: string
+}
+
 
 export type IntialStateType = {
     rooms: RoomType[],

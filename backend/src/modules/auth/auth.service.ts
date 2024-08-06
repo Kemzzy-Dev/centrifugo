@@ -11,21 +11,19 @@ import * as bcrypt from 'bcryptjs';
 import {
   FAILED_TO_CREATE_USER,
   USER_ACCOUNT_EXIST,
-  USER_ACCOUNT_DOES_NOT_EXIST,
   USER_CREATED_SUCCESSFULLY,
   INVALID_CREDENTIALS,
   LOGIN_SUCCESSFUL,
   LOGIN_ERROR,
-  EMAIL_SENT,
 } from '../../helpers/SystemMessages';
 import { JwtService } from '@nestjs/jwt';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { CreateUserDTO } from './dto/create-user.dto';
 import UserService from '../user/user.service';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { LoginDto } from './dto/login.dto';
 import CustomExceptionHandler from '../../helpers/exceptionHandler';
-import authConfig from 'config/auth.config';
+import authConfig from '../../../config/auth.config';
+import { subscribeUserId } from '../../helpers/validate-uuid';
 
 @Injectable()
 export default class AuthenticationService {
@@ -181,11 +179,23 @@ export default class AuthenticationService {
   }
 
   public async addUserToRoom(addUserToRoomOptions: { userId: string; roomId: string }) {
-    return await this.userService.addUserToRoom(addUserToRoomOptions);
+    try {
+      return await this.userService.addUserToRoom({...addUserToRoomOptions});
+      // return await this.userService.createMessage({...addUserToRoomOptions,content: "hi there"});
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException('Error occured');
+    }
   }
 
   public async removeUserFromRoom(removeUserFromRoomPayload: { userId: string; roomId: string }) {
-    await this.userService.removeUserFromRoom(removeUserFromRoomPayload);
+    try {
+      return await this.userService.removeUserFromRoom(removeUserFromRoomPayload);
+      // return await this.userService.createMessage({...removeUserFromRoomPayload,content: "hi there"});
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException('Error occured');
+    }
   }
 
   public async createMessage(createMessageOption: { userId: string; roomId: string; content: string }) {

@@ -25,37 +25,57 @@ interface messageType {
 }
 
 
-
-
-
-
 export default function ChatRoom() {
   const [roomId, setRoomId] = useState('1');
   const { user, setUser } = useAuthContext()
-  const [isLoaded, setIsLoaded] = useState<boolean>(false)
   const router = useRouter()
   const [realTimeStatus, setRealTimeStatus] = useState('🔴')
-  const [activeTab, setActiveTab] = useState('allRooms');
-  const [rooms, setRooms] = useState<RoomType[]>([])
-  const [selectedRoom, setSelectedRoom] = useState<RoomType | null>(null);
-  const [messages, setMessages] = useState<any[]>([]);
+  
+  
   const [messageQueue, setMessageQueue] = useState<any[]>([])
   const [chatStateHandler, dispatch] = useReducer(reducer,initialChatState)
   
 
   console.log(chatStateHandler)
   class SocketManager {
-    public async processUserJoined(body: any) {}
+    public async processUserJoined(body: any) {
+      dispatch({
+        type: "JOIN_ROOM",
+        payload: {
+          roomId,
+          rooms: [body]
+        }
+      })
+    }
 
-    public async processUserLeft(body: any) {}
+    public async processUserLeft(body: any) {
+      dispatch({
+        type: "LEAVE_ROOM",
+        payload: {
+          roomId,
+          rooms: [body]
+        }
+      })
+    }
 
     public async processNewMessage(body: any) {
-
+      dispatch({
+        type: "ADD_MESSAGES",
+        payload: {
+          roomId,
+          messages: [body]
+        }
+      })
     }
   }
 
+
   function onPublication(publication: any) {
-    setMessageQueue((prev) => [...prev, publication])
+    const response = publication
+    console.log(response)
+    // response.body = JSON.parse(response.body)
+    
+    setMessageQueue((prev) => [...prev, response])
   }
 
   const getToken = async () => {
@@ -70,9 +90,6 @@ export default function ChatRoom() {
     return request.token
   }
 
-  useEffect(() => {
-    
-  })
 
 
   useEffect(() => {
@@ -81,9 +98,10 @@ export default function ChatRoom() {
     const MessageProcessor = new SocketManager()
 
     async function processMessage() {
-      console.log("messageQueue => ",messageQueue)
+      
       const message = messageQueue[0]
-      const { type, body} = message[0]
+      
+      const { type, body} = message
       
       switch (type) {
         case 'message_added': {
@@ -106,7 +124,7 @@ export default function ChatRoom() {
       setMessageQueue(prev => prev.slice(1))
     }
 
-    // processMessage()
+    processMessage()
 
   },[messageQueue,chatStateHandler])
 
@@ -119,16 +137,21 @@ export default function ChatRoom() {
               getToken: getToken
           })
 
-          const rooms: RoomType[] = await getRooms(user.access_token)
           
+          const roomsRequest= await getRooms(user.access_token)
+          if (roomsRequest.status_code === 401) {
+            setUser(emptyContext)
+            router.push('/')
+            return
+          }
+          const rooms: RoomType[] = roomsRequest.data
           dispatch({
             type: "INSTANTIATE_MESSAGES",
             payload: {
               rooms: rooms
             }
           })   
-        }
-        init()
+        
 
         centrifuge!.connect()
 
@@ -167,8 +190,8 @@ export default function ChatRoom() {
 
 
         subscription.subscribe()
-        
-
+      }
+      init()
     return () => {
         if (centrifuge){
             console.log("Centrifuge disconnected")
@@ -183,7 +206,7 @@ export default function ChatRoom() {
   return (
     <main className=" flex items-center w-screen min-h-screen">
       <div className="w-[30%] bg-gray-200 h-screen p-4 border-r border-gray-300">
-        <h2 className="text-lg font-semibold mb-4">Chat Rooms</h2>
+        <h2 className="text-lg font-semibold mb-4">Chat Rooms {realTimeStatus}</h2>
         <ul>
           {chatStateHandler.rooms?.map((room: RoomType) => (
             <li
@@ -197,7 +220,7 @@ export default function ChatRoom() {
         </ul>
       </div>
       <div className="w-full">
-        <CustomerChat action={dispatch} currentUser={user.email} roomMessages={chatStateHandler.messagesByRoomId[roomId]} roomId={roomId} />
+        <CustomerChat action={dispatch} authContext={user} chatHandler={chatStateHandler} roomId={roomId} />
       </div>
     </main>
   );

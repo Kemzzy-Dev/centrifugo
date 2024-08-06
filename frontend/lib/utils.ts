@@ -30,3 +30,7 @@ export function dateFormatter(dateString:string) {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
 }
+
+export function subscribeUserId(userId: string) {
+  return userId.split("-").join('')
+}

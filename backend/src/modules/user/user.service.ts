@@ -9,6 +9,8 @@ import UserIdentifierOptionsType from './options/UserIdentifierOptions';
 import { Room } from './entities/room.entity';
 import Message from './entities/message.entity';
 import { BroadcastService } from './broadcast.service';
+import { MessageSerializer, RoomSerializer } from 'src/utils/serializer';
+import { isValidUUID, subscribeUserId } from 'src/helpers/validate-uuid';
 
 @Injectable()
 export default class UserService {
@@ -84,62 +86,120 @@ export default class UserService {
   public async getRoom(id: string) {
     return await this.roomRepository.findOne({
       where: { id },
-      relations: ['messages', 'messages.user', 'members.rooms'],
+      relations: ['messages', 'messages.user', 'members', 'members.rooms'],
     });
   }
 
   public async addUserToRoom({ userId, roomId }: { userId: string; roomId: string }) {
+    if(!isValidUUID(roomId)) {
+      return {
+        status_code: 400,
+        message: 'Invalid room identifier',
+        
+      };
+    }
     const currentRoom = await this.getRoom(roomId);
-    const newMember = await this.getUserById(userId);
-    const channels = await this.getRoomMembers(roomId);
-    const roomMembers = currentRoom.members;
-    currentRoom.members = [...roomMembers, newMember];
-    await this.roomRepository.save(currentRoom);
+    if (!currentRoom) {
+      return {
+        status_code: 400,
+        message: 'Invalid room identifier',
+        
+      };
+    }
 
+    const newMember = await this.getUserById(userId);
+    const roomMembers = currentRoom.members;
+    
+    if (roomMembers.map(member => member.id).includes(newMember.id)) {
+      const channels = await this.getRoomMembers(roomId);
+      console.log(channels)
+      const broadcastPayload = {
+        channels: channels,
+        data: {
+          type: 'user_joined',
+          body: JSON.stringify(RoomSerializer(currentRoom)),
+        },
+        idempotency_key: `user_joined_${newMember.id}`,
+      };
+  
+      await this.broadcastService.broadcastRoom(roomId, broadcastPayload);
+  
+      return {
+        status_code: 200,
+        message: 'Request successful',
+        data: currentRoom,
+      };
+    }
+
+    currentRoom.members = [...roomMembers, newMember];
+    const room = await this.roomRepository.save(currentRoom);
+    const channels = await this.getRoomMembers(roomId);
+    console.log('joined')
+    console.log(channels)
     const broadcastPayload = {
       channels: channels,
       data: {
         type: 'user_joined',
-        body: newMember,
+        body: JSON.stringify(RoomSerializer(room)),
       },
       idempotency_key: `user_joined_${newMember.id}`,
     };
 
-    this.broadcastService.broadcastRoom(roomId, broadcastPayload);
+    await this.broadcastService.broadcastRoom(roomId, broadcastPayload);
+
     return {
       status_code: 200,
       message: 'Request successful',
-      data: newMember,
+      data: room,
     };
   }
 
   public async removeUserFromRoom({ userId, roomId }: { userId: string; roomId: string }) {
+    if(!isValidUUID(roomId)) {
+      return {
+        status_code: 400,
+        message: 'Invalid room identifier',
+        
+      };
+    }
     const currentRoom = await this.getRoom(roomId);
+    if (!currentRoom) {
+      return {
+        status_code: 400,
+        message: 'Invalid room identifier',   
+      };
+    }
+    const initChannels = await this.getRoomMembers(roomId);
     const leavingMember = await this.getUserById(userId);
     const updatedMembers = currentRoom.members.filter(member => member.id !== leavingMember.id);
     currentRoom.members = updatedMembers;
-    await this.roomRepository.save(currentRoom);
-    const channels = this.getRoomMembers(roomId);
-
+    const room = await this.roomRepository.save(currentRoom);
+    const newSub = `personal:${leavingMember.email}`
+    const channels = initChannels.includes(newSub) ? [...initChannels] : [...initChannels,newSub]
+    
     const broadcastPayload = {
       channels: channels,
       data: {
         type: 'user_left',
-        body: leavingMember,
+        body: JSON.stringify(RoomSerializer(room)),
       },
-      idempotency_key: `user_left_${leavingMember.id}`,
+      idempotency_key: `user_left_${leavingMember.email}`,
     };
 
+    await this.broadcastService.broadcastRoom(roomId, broadcastPayload);
+    
     return {
       status_code: 200,
       message: 'Request successful',
-      data: leavingMember,
+      data: room,
     };
   }
 
   public async getRoomMembers(roomId: string) {
-    const members = (await this.getRoom(roomId)).members.map(member => `personal:${member.email}`);
-    return members;
+    const members = (await this.getRoom(roomId)). members
+    console.log("Members ",members)
+    const result = members.map(member => `personal:${member.email}`);
+    return result;
   }
 
   public async createMessage({ userId, roomId, content }: { userId: string; roomId: string; content: string }) {
@@ -155,12 +215,12 @@ export default class UserService {
       room.last_message = newMessage;
       room.messages = [...room.messages, newMessage];
       await this.roomRepository.save(room);
-      console.log(channels);
+      console.log(channels)
       const broadcastPayload = {
         channels: channels,
         data: {
           type: 'message_added',
-          body: newMessage.content,
+          body: MessageSerializer(newMessage),
         },
         idempotency_key: `messsage_${newMessage.id}`,
       };

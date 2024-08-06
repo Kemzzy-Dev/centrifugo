@@ -8,6 +8,8 @@ import { useForm } from 'react-hook-form';
 type FormFields = {
     email: string;
     password: string;
+    first_name: string,
+    last_name: string
   };
 
 const Register = ({ setLoginIsDisplayed }: { setLoginIsDisplayed: (val: boolean) => void }) => {
@@ -18,6 +20,8 @@ const Register = ({ setLoginIsDisplayed }: { setLoginIsDisplayed: (val: boolean)
     const { register, handleSubmit, watch, reset, formState: { errors } } = useForm<FormFields>();
     const watchForEmail = watch("email", "");
     const watchForPassword = watch("password", "");
+    const watchForFirstname = watch("first_name", "");
+    const watchForLastname = watch("last_name", "");
     const router = useRouter()
 
     useEffect(() => {
@@ -25,18 +29,20 @@ const Register = ({ setLoginIsDisplayed }: { setLoginIsDisplayed: (val: boolean)
             watchForEmail.length > 5 &&
             watchForEmail.toLowerCase().includes('@') &&
             watchForEmail.toLowerCase().includes('.com') &&
-            watchForPassword.length >= 8
+            watchForPassword.length >= 8 &&
+            watchForFirstname.length >= 2 &&
+            watchForLastname.length >= 2 
 
         IsFormValid ? setFormIsValid(true) : setFormIsValid(false)
 
-    }, [watchForEmail, watchForPassword]);
+    }, [watchForEmail, watchForPassword,watchForFirstname, watchForLastname]);
 
     async function onSubmit(data: FormFields) {
         const response = await signUp(data)
         if (response.status_code === 201) {
           setErrMessage("registration successfully")
           const context = {
-            username: response.data.user.first_name,
+            id: response.data.user.id,
             email: response.data.user.email,
             access_token: response.access_token,
           }
@@ -76,6 +82,43 @@ const Register = ({ setLoginIsDisplayed }: { setLoginIsDisplayed: (val: boolean)
                             {errors.email && <p className="text-red text-[12px] absolute right-2 top-[32%]">{errors.email.message}</p>}
                         </div>
                     </div>
+
+                    <div className="flex flex-col w-full gap-2">
+                        <label htmlFor="cuurent-password">Firstname</label>
+                        <div className="flex items-center gap-2 relative w-full rounded-md border">
+                            <span className="text-18px absolute left-4 top-[38%] z-10">
+                                <Mail size={'18px'} />
+                            </span>
+                            <input
+                                className={`outline-none flex-1 relative border-gray pl-12 px-4 p-4 focus:ring-1 focus:ring-primary rounded-lg ${errors.password && 'border-red focus:ring-0 border'}`}
+                                {...register("first_name", {
+                                    required: 'cant be empty',
+                                })}
+                                placeholder="John"
+                                type="text"
+                            />
+                            {errors.first_name && <p className="text-red text-[12px] absolute right-2 top-[32%]">{errors.first_name.message}</p>}
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col w-full gap-2">
+                        <label htmlFor="cuurent-password">Lastname</label>
+                        <div className="flex items-center gap-2 relative w-full rounded-md border">
+                            <span className="text-18px absolute left-4 top-[38%] z-10">
+                                <Mail size={'18px'} />
+                            </span>
+                            <input
+                                className={`outline-none flex-1 relative border-gray pl-12 px-4 p-4 focus:ring-1 focus:ring-primary rounded-lg ${errors.password && 'border-red focus:ring-0 border'}`}
+                                {...register("last_name", {
+                                    required: 'cant be empty',
+                                })}
+                                placeholder="Doe"
+                                type="text"
+                            />
+                            {errors.last_name && <p className="text-red text-[12px] absolute right-2 top-[32%]">{errors.last_name.message}</p>}
+                        </div>
+                    </div>
+
                     <div className="flex flex-col w-full gap-4">
                         <label htmlFor="new-password">Password</label>
                         <div className="flex items-center gap-2 relative w-full rounded-md border">

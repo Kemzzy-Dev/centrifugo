@@ -68,6 +68,7 @@ export default class RegistrationController {
     @Req() request: Request
   ): Promise<any> {
     const userId = request['user'].sub;
+    console.log('Request received :=>  ', { body, roomId });
     return this.authService.createMessage({ roomId, userId, content: body.message });
   }
 
@@ -83,11 +84,12 @@ export default class RegistrationController {
 
   @Post('rooms/:room_id/leave')
   @ApiOperation({ summary: 'Leave room' })
-  @ApiResponse({ status: 200, description: 'Login successful', type: LoginResponseDto })
+  @ApiResponse({ status: 200, description: 'Leave room', type: LoginResponseDto })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @HttpCode(200)
-  async leaveRoom(@Body() loginDto: LoginDto): Promise<LoginResponseDto | { status_code: number; message: string }> {
-    return this.authService.loginUser(loginDto);
+  async leaveRoom(@Param('room_id') roomId: string, @Req() request: Request): Promise<any> {
+    const userId = request['user'].sub;
+    return this.authService.removeUserFromRoom({userId,roomId});
   }
 
   @Get('rooms')

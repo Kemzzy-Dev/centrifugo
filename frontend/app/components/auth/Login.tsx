@@ -38,7 +38,7 @@ const Login = ({ setLoginIsDisplayed }: { setLoginIsDisplayed: (value: boolean) 
         if (response.status_code === 200) {
           setErrMessage("authenticated successfully")
           const context = {
-            username: response.data.user.first_name,
+            id: response.data.user.id,
             email: response.data.user.email,
             access_token: response.access_token,
           }
