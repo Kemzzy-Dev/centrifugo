@@ -203,8 +203,6 @@ export default function ChatRoom() {
 
 },[])
 
-
-
   return (
     <main className=" flex items-center w-screen min-h-screen">
       <div className="w-[30%] bg-gray-200 h-screen p-4 border-r border-gray-300">
