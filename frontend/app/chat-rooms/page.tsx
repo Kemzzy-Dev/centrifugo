@@ -144,6 +144,8 @@ export default function ChatRoom() {
             router.push('/')
             return
           }
+
+          
           const rooms: RoomType[] = roomsRequest.data
           dispatch({
             type: "INSTANTIATE_MESSAGES",

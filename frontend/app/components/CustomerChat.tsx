@@ -39,7 +39,7 @@ const CustomerChat = ({ roomId, chatHandler, authContext, action }: { roomId: st
     const request = await leaveRoom(authContext.access_token,roomId)
     if (request.status_code === 401) {
       setUser(emptyContext)
-      router.push('/')
+      // router.push('/')
     }
     if (request.status_code === 200) {
       const rooms = request.data
