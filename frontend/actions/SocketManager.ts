@@ -279,22 +279,22 @@ export function reducer(state: InitialStateType = initialChatState, action: any)
       return initialChatState;
     }
 
-    case 'INSTANTIATE_MESSAGES': {
-      const room: RoomType = action.payload.room;
+    // case 'INSTANTIATE_MESSAGES': {
+    //   const room: RoomType = action.payload.room;
       
-      // Initialize messages for the room and reverse them for chronological order.
-      const messages = [...room.messages].reverse();
+    //   // Initialize messages for the room and reverse them for chronological order.
+    //   const messages = [...room?.messages].reverse();
       
-      // Initialize the state with a single room.
-      const roomsById: RoomsById = { [room.id]: room };
-      const messagesByRoomId: MessagesByRoomsById = { [room.id]: messages };
+    //   // Initialize the state with a single room.
+    //   const roomsById: RoomsById = { [room.id]: room };
+    //   const messagesByRoomId: MessagesByRoomsById = { [room.id]: messages };
       
-      return {
-        rooms: [room],
-        roomsById,
-        messagesByRoomId,
-      };
-    }
+    //   return {
+    //     rooms: [room],
+    //     roomsById,
+    //     messagesByRoomId,
+    //   };
+    // }
     
 
     case 'SET_ROOM_MEMBER_COUNT': {

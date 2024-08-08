@@ -56,6 +56,7 @@ export async function getCentrifugeToken(
 }
 
 export async function sendMessage(payload: SendMessagePayload) {
+  console.log(payload)
   const request = await fetch(`${API_URL}/rooms/${payload.roomId}/message`, {
     headers: {
       Authorization: `Bearer ${payload.token}`,
