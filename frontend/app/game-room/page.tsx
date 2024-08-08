@@ -8,15 +8,31 @@ import { useRouter } from 'next/navigation';
 import { mockUsers } from '../components/asset/mockUser';
 import OddLayout from '../components/OddLayout';
 import EvenLayout from '../components/EvenLayout';
+import { emptyContext, useAuthContext } from '@/context/AuthContext';
+import { sendMessage } from '@/actions';
 
 
 const GameRoom = ({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) => {
     const [text, setText] = useState('')
+    const { user, setUser } = useAuthContext()
     const [isCopied, setIsCopied] = useState(false)
     const router = useRouter()
     const session = sessionStorage.getItem('Joined')
-    const handleSendMessage = () => {
-        console.log(text);
+
+
+    const handleSendMessage = async () => {
+
+        const payload = {
+            message: text,
+            token: user.access_token,
+            roomId: searchParams.roomId
+        }
+
+        const request = await sendMessage(payload)
+        if (request.status_code === 401) {
+            setUser(emptyContext)
+            router.push('/')
+        }
     }
 
     const oddLayout = mockUsers.length % 2 !== 0

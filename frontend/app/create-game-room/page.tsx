@@ -1,9 +1,12 @@
 'use client'
 
+import { createGameRoom } from '@/actions';
 import { Gamepad } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { version } from 'os';
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
+import { string } from 'zod';
 
 type FormFields = {
     name: string;
@@ -30,11 +33,18 @@ const CreateGameRoom = () => {
     async function onSubmit(data: FormFields) {
         //Set laoding to true here
         setLoading(true)
+        // const request = await createGameRoom(data.name, 1)
+        // const response = await request.json()
+        // console.log(response);
+        // if(response.status_code === 200) {
+            
+        // }
+        // const reponse = await reques
         //handle form submission and creation ofgame room on backend
         //return room id to frontend
         //route user to join game page
         //example: router.push(`/join-game/${<game-romm-id>}`)
-        router.push(`/join-game/${data.name}`)
+        // router.push(`/join-game/${data.name}`)
         //setLoading to false upon form submision
         console.log(data);
     }

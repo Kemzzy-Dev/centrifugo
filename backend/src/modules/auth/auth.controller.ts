@@ -35,7 +35,7 @@ export default class RegistrationController {
   }
 
   @Post('room')
-  @ApiOperation({ summary: 'Login a user' })
+  @ApiOperation({ summary: 'Create room' })
   @ApiResponse({ status: 200, description: 'Login successful', type: LoginResponseDto })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @HttpCode(200)
