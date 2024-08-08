@@ -41,7 +41,7 @@ export default function AuthContext({children} :Props) {
     useEffect(() => {
         if (!user.access_token) {
             console.log("Missing token")
-            router.push('/')
+            // router.push('/')
             return
         }
     },[])

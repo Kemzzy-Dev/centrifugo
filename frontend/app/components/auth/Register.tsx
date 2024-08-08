@@ -38,6 +38,7 @@ const Register = ({ setLoginIsDisplayed }: { setLoginIsDisplayed: (val: boolean)
     }, [watchForEmail, watchForPassword,watchForFirstname, watchForLastname]);
 
     async function onSubmit(data: FormFields) {
+        setLoading(true)
         const response = await signUp(data)
         if (response.status_code === 201) {
           setErrMessage("registration successfully")
@@ -48,16 +49,16 @@ const Register = ({ setLoginIsDisplayed }: { setLoginIsDisplayed: (val: boolean)
           }
           setUser(context)
           router.push('/chat-rooms')
+          setLoading(false)
           return
         }
         setErrMessage(response.message)
-        
     }
 
     return (
         <div className="w-full md:w-[60%] text-dark-light lg:w-[50%] flex flex-col">
             <form
-                className="flex w-full flex-col gap-8 md:shadow-md px-4 md:px-8 py-10 rounded-lg bg-white md:w-[674px]"
+                className="flex w-full flex-col gap-8 shadow-custom-inset px-4 md:px-8 py-10 rounded-lg bg-white md:w-[674px]"
                 onSubmit={handleSubmit(onSubmit)}
             >
                 <div className="flex flex-col gap-2">
@@ -138,16 +139,16 @@ const Register = ({ setLoginIsDisplayed }: { setLoginIsDisplayed: (val: boolean)
                         </div>
                     </div>
                 </div>
-                {/* {errMessage && <p className="text-red text-[18px] pb-2">{errMessage}</p>} */}
-                <button type="submit" className="bg-blue-600 p-[11px] rounded-lg text-[18px] text-white">
+                {errMessage && <p className="text-red text-[18px] pb-2">{errMessage}</p>}
+                <button type="submit" className="bg-primary-yellow border shadow-custom-inset border-secondary p-[11px] rounded-lg text-[18px] text-white">
                     {loading ? 'Loading...' : 'Signup'}
                 </button>
                 <p
                     className="text-center flex flex-col md:flex-row md:justify-center gap-4 items-center md:gap-[.2em]">
-                    Dont have an account?
+                    Already have an account?
                     <span onClick={() => setLoginIsDisplayed(true)}
-                        className="text-primary cursor-pointer">
-                        Create account
+                        className="text-black cursor-pointer">
+                        Signin
                     </span>
                 </p>
             </form>
