@@ -40,11 +40,11 @@ interface messageType {
 const GameRoom = ({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: { [key: string]: string };
 }) => {
   const [text, setText] = useState("");
   const [isCopied, setIsCopied] = useState(false);
-  const [roomId, setRoomId] = useState("1");
+  const [roomId, setRoomId] = useState('');
   const { user, setUser } = useAuthContext();
   const router = useRouter();
   const [realTimeStatus, setRealTimeStatus] = useState("🔴");
@@ -53,6 +53,11 @@ const GameRoom = ({
   const [chatStateHandler, dispatch] = useReducer(reducer, initialChatState);
   const session = sessionStorage.getItem("Joined");
   const roomMessages = chatStateHandler.messagesByRoomId[roomId];
+
+
+  useEffect(() => {
+    setRoomId(searchParams.roomId)
+  }, [])
 
   function belongsToRoom() {
     const rooms = chatStateHandler.roomsById;
@@ -171,11 +176,6 @@ const GameRoom = ({
     processMessage();
   }, [messageQueue, chatStateHandler]);
 
-  //   useEffect(() => {
-  //     if (!session) {
-  //       router.push(`/join-game/${searchParams.roomId}`);
-  //     }
-  //   }, [router, searchParams, session]);
 
   useEffect(() => {
     let centrifuge: Centrifuge | null = null;
