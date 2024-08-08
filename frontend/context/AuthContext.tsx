@@ -36,6 +36,13 @@ export default function AuthContext({children} :Props) {
         return emptyContext;
       });
     const router = useRouter()
+
+    useEffect(() => {
+        const storedUserContext = localStorage.getItem('userContext');
+        if (storedUserContext) {
+          setUserContext(JSON.parse(storedUserContext));
+        }
+      }, []);
       
     useEffect(() => {
         if (!user.access_token) {

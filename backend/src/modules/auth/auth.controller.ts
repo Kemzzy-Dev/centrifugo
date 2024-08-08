@@ -40,6 +40,7 @@ export default class RegistrationController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @HttpCode(200)
   async message(@Body() body: { title: string; version: number }): Promise<any> {
+    console.log(body);
     return this.authService.createRoom(body);
   }
 
@@ -89,7 +90,7 @@ export default class RegistrationController {
   @HttpCode(200)
   async leaveRoom(@Param('room_id') roomId: string, @Req() request: Request): Promise<any> {
     const userId = request['user'].sub;
-    return this.authService.removeUserFromRoom({userId,roomId});
+    return this.authService.removeUserFromRoom({ userId, roomId });
   }
 
   @Get('rooms')
