@@ -122,9 +122,6 @@ export async function signUp(payload: CreateUserDTO): Promise<AuthResponseDto> {
 }
 
 
-
-
-
 const ErrorResponse = {
   status_code: 500,
   message: "Error occured",

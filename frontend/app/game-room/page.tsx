@@ -28,7 +28,7 @@ const GameRoom = ({ searchParams }: { searchParams: { [key: string]: string | st
         if (!session) {
             router.push(`/join-game/${searchParams.roomId}`)
         }
-    }, [])
+    }, [router, searchParams, session])
 
     // handleShowMenu, handleGoBack, handleShareGameLink, handleHowToPlayClick
     const handleShareGameLink = () => {
