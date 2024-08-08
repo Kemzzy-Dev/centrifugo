@@ -1,45 +1,50 @@
 'use client'
-
 import { Gamepad } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
-
+import AuthContext, {
+    useAuthContext,
+    emptyContext,
+  } from "@/context/AuthContext";
+import { joinRoom } from '@/actions';
 type FormFields = {
     name: string;
     id: string;
 };
-
-
 const JoinGameForm = ({params}: {params: {id: string}}) => {
     const [errMessage, setErrMessage] = useState("");
     const [loading, setLoading] = useState(false);
     const [formIsValid, setFormIsValid] = useState(false);
     const { register, handleSubmit, watch, reset, formState: { errors } } = useForm<FormFields>();
+    const {user, setUser} = useAuthContext();
     const watchForName = watch("name", "");
     const router = useRouter()
-    
     useEffect(() => {
         const IsFormValid =
         watchForName.length > 5
-        
         IsFormValid ? setFormIsValid(true) : setFormIsValid(false)
-        
     }, [watchForName]);
-    
     async function onSubmit(data: FormFields) {
         //handle form submission and centrifugo connection
         //route to game room
         setLoading(true)
         if(formIsValid){
             sessionStorage.setItem('Joined', JSON.stringify(data.id))
-            router.push(`/game-room?roomId=${params.id}`)
-            setLoading(false)
-
+            try {
+                const request = await joinRoom(user.access_token, params.id );
+                const response = request;
+                if(response.status === 200){
+                    router.push(`/game-room?roomId=${params.id}`)
+                    setLoading(false)
+                }
+            }catch (error: any) {
+                setErrMessage(error.message)
+                throw new Error(error.message)
+            }
             // Also add uer to room in centrifugo and database
         }
     }
-
     return (
         <div className="w-full justify-center items-center min-h-screen bg-primary flex flex-col ">
             <form
@@ -88,5 +93,4 @@ const JoinGameForm = ({params}: {params: {id: string}}) => {
         </div>
     )
 }
-
 export default JoinGameForm

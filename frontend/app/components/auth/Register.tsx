@@ -48,7 +48,7 @@ const Register = ({ setLoginIsDisplayed }: { setLoginIsDisplayed: (val: boolean)
             access_token: response.access_token,
           }
           setUser(context)
-          router.push('/chat-rooms')
+          router.push('/create-game-room')
           setLoading(false)
           return
         }
