@@ -46,6 +46,9 @@ const Login = ({ setLoginIsDisplayed }: { setLoginIsDisplayed: (value: boolean) 
         //   console.log(context)
           router.push('/create-game-room')
           setLoading(false)
+        }else{
+            setLoading(false)
+            setErrMessage(response.message)
         }
         setErrMessage("authentication failed")
     }
