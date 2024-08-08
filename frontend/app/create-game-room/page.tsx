@@ -28,16 +28,24 @@ const CreateGameRoom = () => {
     }, [watchForName]);
 
     async function onSubmit(data: FormFields) {
-        //Set laoding to true here
-        setLoading(true)
-        //handle form submission and creation ofgame room on backend
-        //return room id to frontend
-        //route user to join game page
-        //example: router.push(`/join-game/${<game-romm-id>}`)
-        router.push(`/join-game/${data.name}`)
-        //setLoading to false upon form submision
-        console.log(data);
-    }
+        setLoading(true);
+    
+        try {
+          const roomVersion = 1;
+          const result = await createRoo(
+            data.name,
+            roomVersion,
+            user.access_token
+          );
+          const roomId = result.id;
+          
+          router.push(`/join-game/${roomId}`);
+        } catch (error) {
+          setErrMessage((error as any).message);
+        } finally {
+          setLoading(false);
+        }
+      }
 
     return (
         <div className="w-full justify-center items-center min-h-screen bg-primary flex flex-col ">
