@@ -3,7 +3,7 @@ import PlayerComponent from './PlayerComponent'
 import { mockUsers } from './asset/mockUser'
 
 
-const OddLayout = () => {
+const OddLayout = ({content}: {content: string}) => {
     const interval = mockUsers.length/3
     return (
         <div className='flex flex-col gap-10'>

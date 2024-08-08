@@ -272,8 +272,8 @@ const GameRoom = ({
         handleShareGameLink={handleShareGameLink}
       />
       <section className="md:px-20 min-h-[400px] flex flex-col justify-center  px-4">
-        {/* {oddLayout && <OddLayout />}
-        {evenLayout && <EvenLayout />} */}
+        {oddLayout && <OddLayout content="" />}
+        {/* {evenLayout && <EvenLayout />} */}
         {roomMessages?.map((message) => (
             <p key={message.id}>
                 {message.content}
