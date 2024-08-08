@@ -186,6 +186,7 @@ const GameRoom = ({
       });
 
       const roomsRequest = await getRooms(user.access_token);
+      console.log(roomsRequest)
       if (roomsRequest.status_code === 401) {
         setUser(emptyContext);
         router.push("/");
@@ -273,7 +274,7 @@ const GameRoom = ({
       <section className="md:px-20 min-h-[400px] flex flex-col justify-center  px-4">
         {/* {oddLayout && <OddLayout />}
         {evenLayout && <EvenLayout />} */}
-        {roomMessages.map((message) => (
+        {roomMessages?.map((message) => (
             <p key={message.id}>
                 {message.content}
             </p>
