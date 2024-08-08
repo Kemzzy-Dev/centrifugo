@@ -144,6 +144,8 @@ export default function ChatRoom() {
             router.push('/')
             return
           }
+
+          
           const rooms: RoomType[] = roomsRequest.data
           dispatch({
             type: "INSTANTIATE_MESSAGES",
@@ -200,8 +202,6 @@ export default function ChatRoom() {
     }
 
 },[])
-
-
 
   return (
     <main className=" flex items-center w-screen min-h-screen">
