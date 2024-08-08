@@ -13,7 +13,9 @@ const PlayerComponent = ({ name, message, id, key }: { name: string, message: st
           <span className='capitalize text-[14px]'>{name}</span>
         </div>
       </div>
-      <span className='py-2 px-3 bg-white text-[12px] before:bg-red before:absolute before:w-[20px] before:content-none z-10 before:h-[20px] rounded-lg'>{message}</span>
+      <span className='py-2 px-3 bg-white text-[12px] before:bg-red before:absolute before:w-[20px] before:content-none z-10 before:h-[20px] rounded-lg'>
+        {message}
+      </span>
     </div>
   )
 }
