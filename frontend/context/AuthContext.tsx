@@ -1,4 +1,5 @@
 "use client"
+
 import { useRouter } from 'next/navigation'
 import React, { createContext, useContext, useEffect, useState } from 'react'
 
@@ -27,8 +28,13 @@ export const emptyContext = {
 }
 
 export default function AuthContext({children} :Props) {
-    const defaultUserContext = localStorage.getItem('userContext') ? JSON.parse(localStorage.getItem('userContext')!) : emptyContext
-    const [user,setUserContext] = useState<UserContext>(defaultUserContext)
+    const [user, setUserContext] = useState<UserContext>(() => {
+        if (typeof window !== "undefined") {
+          const storedUserContext = localStorage.getItem("userContext");
+          return storedUserContext ? JSON.parse(storedUserContext) : emptyContext;
+        }
+        return emptyContext;
+      });
     const router = useRouter()
 
     useEffect(() => {
@@ -41,10 +47,10 @@ export default function AuthContext({children} :Props) {
     useEffect(() => {
         if (!user.access_token) {
             console.log("Missing token")
-            // router.push('/')
+            router.push('/')
             return
         }
-    },[])
+    },[user, router])
 
     function setUser(value: UserContext) {
         localStorage.setItem('userContext',JSON.stringify(value))
@@ -65,6 +71,3 @@ export function useAuthContext() {
     }
     return context
 }
-
-
-
