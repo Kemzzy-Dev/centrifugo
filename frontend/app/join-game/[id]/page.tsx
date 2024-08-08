@@ -28,7 +28,8 @@ const JoinGameForm = ({params}: {params: {id: string}}) => {
     }, [watchForName]);
     
     async function onSubmit(data: FormFields) {
-        
+        //handle form submission and centrifugo connection
+        //route to game room
         setLoading(true)
         if(formIsValid){
             sessionStorage.setItem('Joined', JSON.stringify(data.id))
