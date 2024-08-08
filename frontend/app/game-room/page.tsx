@@ -40,11 +40,11 @@ interface messageType {
 const GameRoom = ({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: { [key: string]: string };
 }) => {
   const [text, setText] = useState("");
   const [isCopied, setIsCopied] = useState(false);
-  const [roomId, setRoomId] = useState("1");
+  const [roomId, setRoomId] = useState(searchParams.roomId);
   const { user, setUser } = useAuthContext();
   const router = useRouter();
   const [realTimeStatus, setRealTimeStatus] = useState("🔴");
@@ -78,6 +78,10 @@ const GameRoom = ({
       router.push('/')
     }
   };
+
+  useEffect(() => {
+    setRoomId(searchParams.roomId)
+  }, []);
 
   const oddLayout = mockUsers.length % 2 !== 0;
   const evenLayout = mockUsers.length % 2 === 0;
