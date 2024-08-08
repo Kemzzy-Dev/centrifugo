@@ -49,8 +49,9 @@ const Login = ({ setLoginIsDisplayed }: { setLoginIsDisplayed: (value: boolean) 
         }else{
             setLoading(false)
             setErrMessage(response.message)
+            //Display error mesage to user
         }
-        setErrMessage("authentication failed")
+        
     }
 
     return (
