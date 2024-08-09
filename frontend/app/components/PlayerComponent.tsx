@@ -5,7 +5,7 @@ import React from 'react'
 
 const PlayerComponent = ({ name, message, id, key }: { name: string, message: string, id: number, key: number }) => {
   return (
-    <div key={key} className='flex w-max items-start gap-3 p-2'>
+    <div key={id} className='flex w-max items-start gap-3 p-2'>
       <div className='flex relative flex-col gap-2 items-center'>
         <div><Image src={avartar} width={50} height={50} alt='' /></div>
         <div className='flex gap-2 items-center'>

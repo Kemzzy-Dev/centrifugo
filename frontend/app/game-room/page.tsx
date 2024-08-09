@@ -16,12 +16,16 @@ import {
   getCentrifugeToken,
   getChannelSubscriptionToken,
   getRooms,
+  joinRoom,
+  leaveRoom,
   sendMessage,
 } from "@/actions";
 import { reducer } from "@/actions/SocketManager";
-import { RoomType, InitialStateType } from "@/lib/types";
+import { RoomType, InitialStateType, MessageType } from "@/lib/types";
 import { Centrifuge, SubscriptionState } from "centrifuge";
 import appConfig from "@/config/appConfig";
+import { dateFormatter } from "@/lib/utils";
+
 
 
 const initialChatState: InitialStateType = {
@@ -51,8 +55,20 @@ const GameRoom = ({
 
   const [messageQueue, setMessageQueue] = useState<any[]>([]);
   const [chatStateHandler, dispatch] = useReducer(reducer, initialChatState);
-  const session = sessionStorage.getItem("Joined");
   const roomMessages = chatStateHandler.messagesByRoomId[roomId];
+  const room = chatStateHandler.roomsById[roomId];
+  const [messageBubbles, setMessageBubbles] = useState<{ [userId: string]: boolean }>({});
+
+  const showMessageBubble = (userId: string) => {
+    setMessageBubbles({ ...messageBubbles, [userId]: true });
+    setTimeout(() => {
+        setMessageBubbles({ ...messageBubbles, [userId]: false });
+    }, 10000); // Hide after 10 seconds
+}
+
+  function myMessage (message: MessageType) {
+    return message.user?.id === user.id;
+  }
 
   function belongsToRoom() {
     const rooms = chatStateHandler.roomsById;
@@ -64,6 +80,43 @@ const GameRoom = ({
     return false;
   }
 
+  async function handleLeaveRoom() {
+    const request = await leaveRoom(user.access_token,roomId)
+    if (request.status_code === 401) {
+      setUser(emptyContext)
+      router.push('/create-game-room')
+    }
+    if (request.status_code === 200) {
+      const rooms = request.data
+      dispatch({
+        type: "LEAVE_ROOM",
+        payload: {
+          roomId,
+          rooms: [rooms]
+        }
+      })
+    }
+  }
+
+  async function handleJoinRoom() {
+    const request = await joinRoom(user.access_token,roomId)
+    if (request.status_code === 401) {
+      setUser(emptyContext)
+      router.push('/')
+    }
+
+    if (request.status_code === 200) {
+      const rooms = request.data
+      dispatch({
+        type: "JOIN_ROOM",
+        payload: {
+          roomId,
+          rooms: [rooms]
+        }
+      })
+    }
+  }
+
   const handleSendMessage = async () => {
     console.log(text);
     const payload = {
@@ -71,6 +124,7 @@ const GameRoom = ({
       token: user.access_token,
       roomId,
     };
+    setText("")
 
     const request =await sendMessage(payload)
     if (request.status_code === 401) {
@@ -82,10 +136,6 @@ const GameRoom = ({
   useEffect(() => {
     setRoomId(searchParams.roomId)
   }, []);
-
-  const oddLayout = mockUsers.length % 2 !== 0;
-  const evenLayout = mockUsers.length % 2 === 0;
-
   class SocketManager {
     public async processUserJoined(body: any) {
       dispatch({
@@ -153,6 +203,7 @@ const GameRoom = ({
       switch (type) {
         case "message_added": {
           MessageProcessor.processNewMessage(body);
+          showMessageBubble(body.user.id);
           break;
         }
 
@@ -163,7 +214,6 @@ const GameRoom = ({
 
         case "user_left": {
           MessageProcessor.processUserLeft(body);
-          break;
         }
         default:
           console.log("Invalid message type");
@@ -174,12 +224,6 @@ const GameRoom = ({
 
     processMessage();
   }, [messageQueue, chatStateHandler]);
-
-  //   useEffect(() => {
-  //     if (!session) {
-  //       router.push(`/join-game/${searchParams.roomId}`);
-  //     }
-  //   }, [router, searchParams, session]);
 
   useEffect(() => {
     let centrifuge: Centrifuge | null = null;
@@ -234,7 +278,7 @@ const GameRoom = ({
       });
 
       centrifuge!.on("connected", (ctx) => {
-        console.log(ctx.transport);
+        console.log("Web socket connected",ctx.transport);
       });
 
       subscription.on("publication", (ctx) => {
@@ -252,58 +296,82 @@ const GameRoom = ({
       }
     };
   }, []);
+  
 
   // handleShowMenu, handleGoBack, handleShareGameLink, handleHowToPlayClick
   const handleShareGameLink = () => {
     setIsCopied(true);
+    const returnToUrl = `${window.location.origin}/bingo/join-game/${searchParams.roomId}`
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(
-        `${appConfig.socketUrl}/bingo/join-game/${searchParams.roomId}`
-      );
+      navigator.clipboard.writeText(returnToUrl);
 
       setTimeout(() => {
         setIsCopied(false);
       }, 1000);
     }
-
-    console.log(`${appConfig.socketUrl}/join-game/${searchParams.roomId}`);
   };
 
+  const renderMembers = () => {
+    const rooms = chatStateHandler.roomsById;
+    if (roomId in rooms) {
+        const room: RoomType = rooms[roomId];
+        return room.members.map((member, index) => {
+            const latestMessage = roomMessages.filter((msg: any) => msg.user?.id === member.id).pop()?.content; // Find latest message
+            return (
+                <div key={member.id} className={`flex flex-col items-center w-1/2 ${index % 2 === 0 ? 'mr-auto' : 'ml-auto'}`}>
+                    <div className="flex-shrink-0 h-20 w-20 rounded-full bg-gray-300 mb-2"></div> 
+                    <p>{member.first_name}</p>
+                    <span className="ml-2">{realTimeStatus}</span>
+                    {messageBubbles[member.id] && latestMessage && ( // Check if latestMessage exists
+                        <div className="bg-blue-500 text-white p-2 rounded-lg mt-2">
+                            {latestMessage} 
+                        </div>
+                    )}
+                </div>
+            )
+        });
+    }
+    return null;
+};
+
+
   return (
-    <main className="flex flex-col min-h-screen pt-[90px] bg-primary">
+    <main className="flex flex-col min-h-screen pt-[90px] bg-primary relative">
       <GameCustomizeNavBar
         isCopied={isCopied}
         handleShareGameLink={handleShareGameLink}
       />
-      <section className="md:px-20 min-h-[400px] flex flex-col justify-center  px-4">
-        {oddLayout && <OddLayout content="" />}
-        {/* {evenLayout && <EvenLayout />} */}
-        {roomMessages?.map((message) => (
-            <p key={message.id}>
-                {message.content}
-            </p>
-        ))}
-      </section>
-      <div className="flex w-full justify-center">
-        <div className="flex fixed md:border-none border border-black bottom-6 w-[80%] md:w-[40%] items-center gap-1g md:p-4">
-          <InputEmoji
-            value={text}
-            onChange={setText}
-            cleanOnEnter
-            onEnter={handleSendMessage}
-            borderColor="black"
-            background="transparent"
-            shouldReturn={true}
-            shouldConvertEmojiToImage={false}
-            placeholder="Type a message"
-          />
-          <button
-            onClick={handleSendMessage}
-            className="md:p-2 p-1 rounded-full bg-black text-white bg-opacity-50"
-          >
-            <ArrowUp size={"16px"} />
-          </button>
+
+      <div className="flex flex-col flex-grow w-full bg-yellow-100 shadow-xl overflow-hidden pt-8">
+        <div className="flex flex-row flex-wrap justify-around mb-4">
+          {" "}
+        
+          {renderMembers()}
         </div>
+        {belongsToRoom() && (
+            
+          <div className="bg-white-300 flex items-center gap-2 p-4 sticky bottom-0">
+            <InputEmoji
+              value={text}
+              onChange={setText}
+              cleanOnEnter
+              onEnter={handleSendMessage}
+              background="transparent"
+              shouldReturn={true}
+              shouldConvertEmojiToImage={false}
+              placeholder="Type a message"
+            />
+            <button
+              onClick={handleSendMessage}
+              className="p-2 rounded-full bg-black text-white bg-opacity-50"
+            >
+              <ArrowUp size={"18px"} />
+            </button>
+            <div className="absolute top-20 right-52"> {/* Position the buttons in the top right corner */}
+            <button onClick={handleLeaveRoom} className='btn bg-red-400 rounded-sm px-3 py-2 text-white hover:bg-red-500'>Leave Game</button> {/* Leave Game button */}
+          </div>
+          </div>
+        )}
       </div>
     </main>
   );
