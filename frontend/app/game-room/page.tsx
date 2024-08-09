@@ -149,6 +149,7 @@ const GameRoom = ({
 
   const getToken = async () => {
     const request = await getCentrifugeToken(user.access_token);
+    
     if (request.status_code === 401) {
       setUser(emptyContext);
       router.push('/')
@@ -233,7 +234,11 @@ const GameRoom = ({
     let centrifuge: Centrifuge | null = null;
     
     const init = async () => {
-      const socketUrl = (await getWebsocketUrl()) as string
+      const socketUrl = appConfig.socketUrl as string
+      if (!socketUrl) {
+        throw new Error('Websocket url not provided')
+      }
+      console.log("Socket Url: ",socketUrl)
       centrifuge = new Centrifuge(socketUrl, {
         debug: true,
         getToken: getToken,
