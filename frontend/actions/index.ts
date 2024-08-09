@@ -70,7 +70,7 @@ export async function sendMessage(payload: SendMessagePayload) {
 }
 
 export async function getRooms(token: string) {
-  const request = await fetch(`${API_URL}/rooms/`, {
+  const request = await fetch(`${API_URL}/rooms`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -181,9 +181,13 @@ type CreateUserDTO = {
 };
 
 type CreateRoomResponse = {
+  status_code: number,
+  message: string,
+  data: {
   id: string;
   name: string;
   version: number;
+  }
 };
 
 export async function createRoom(
@@ -200,10 +204,7 @@ export async function createRoom(
     body: JSON.stringify({ title, version }),
   });
 
-  console.log(response, "response");
-  if (!response.ok) {
-    throw new Error("Failed to create room");
-  }
+  const res = await response.json()
 
-  return await response.json();
+  return res;
 }

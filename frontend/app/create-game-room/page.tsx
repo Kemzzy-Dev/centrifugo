@@ -2,7 +2,7 @@
 
 import { createRoom, getCentrifugeToken } from "@/actions";
 import appConfig from "@/config/appConfig";
-import { useAuthContext } from "@/context/AuthContext";
+import { emptyContext, useAuthContext } from "@/context/AuthContext";
 import { Centrifuge } from "centrifuge";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";

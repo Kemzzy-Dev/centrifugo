@@ -13,18 +13,8 @@ export class CreateUserDTO {
   @IsString()
   last_name: string;
 
-  @MinLength(8)
+  
   @IsNotEmpty()
-  @IsStrongPassword(
-    {},
-    {
-      message:
-        'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
-    }
-  )
   password: string;
 
-  @IsOptional()
-  @IsString()
-  admin_secret?: string;
 }

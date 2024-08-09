@@ -7,7 +7,7 @@ import {
   ForbiddenException,
   HttpException,
 } from '@nestjs/common';
-import * as bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcrypt'
 import {
   FAILED_TO_CREATE_USER,
   USER_ACCOUNT_EXIST,
@@ -23,7 +23,6 @@ import UserService from '../user/user.service';
 import { LoginDto } from './dto/login.dto';
 import CustomExceptionHandler from '../../helpers/exceptionHandler';
 import authConfig from '../../../config/auth.config';
-import { subscribeUserId } from '../../helpers/validate-uuid';
 
 @Injectable()
 export default class AuthenticationService {
@@ -135,7 +134,6 @@ export default class AuthenticationService {
       }
 
       const access_token = this.jwtService.sign({ username: user.first_name, sub: user.id, email: user.email });
-      const centrifugo_token = await this.generateCentrifugoJWT(user.id);
 
       const responsePayload = {
         access_token,
@@ -191,7 +189,7 @@ export default class AuthenticationService {
   public async removeUserFromRoom(removeUserFromRoomPayload: { userId: string; roomId: string }) {
     try {
       return await this.userService.removeUserFromRoom(removeUserFromRoomPayload);
-      // return await this.userService.createMessage({...removeUserFromRoomPayload,content: "hi there"});
+      
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException('Error occured');

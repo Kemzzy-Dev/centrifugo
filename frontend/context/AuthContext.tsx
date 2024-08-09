@@ -52,7 +52,7 @@ export default function AuthContext({children} :Props) {
             router.push('/')
             return
         }
-    },[user, router])
+    },[user])
 
     function setUser(value: UserContext) {
         localStorage.setItem('userContext',JSON.stringify(value))
