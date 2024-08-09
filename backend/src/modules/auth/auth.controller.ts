@@ -35,4 +35,18 @@ export default class RegistrationController {
   }
 
 
+  @Get('token')
+  async getToken(@Req() request: Request) {
+    const user = request['user'];
+    return await this.authService.getCentrifugoJWT(user.email);
+  }
+
+  @Get('subscription/token/:channelId/:identifier')
+  async getPersonalizedToken(@Param() params, @Req() request: Request) {
+    const user = request['user'];
+    const { channelId, identifier } = params;
+    const channel = `${channelId}:${identifier}`;
+    return await this.authService.generatePersonalizedToken({ channel, user });
+  }
+
 }

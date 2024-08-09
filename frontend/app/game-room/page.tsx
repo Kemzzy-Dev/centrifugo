@@ -185,6 +185,7 @@ const GameRoom = ({
     if (request.status_code !== 200) {
       throw new Error("Error occured");
     }
+    console.log(request)
     return request.token;
   };
 
