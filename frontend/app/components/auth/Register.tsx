@@ -41,7 +41,7 @@ const Register = ({ setLoginIsDisplayed }: { setLoginIsDisplayed: (val: boolean)
         setLoading(true)
         const response = await signUp(data)
         if (response.status_code === 201) {
-          setErrMessage("registration successfully")
+          setErrMessage("registration successfull, login to continue")
           const context = {
             id: response.data.user.id,
             email: response.data.user.email,

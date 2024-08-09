@@ -22,7 +22,7 @@ const JoinGameForm = ({params}: {params: {id: string}}) => {
     const router = useRouter()
     useEffect(() => {
         const IsFormValid =
-        watchForName.length > 5
+        watchForName.length > 2
         IsFormValid ? setFormIsValid(true) : setFormIsValid(false)
     }, [watchForName]);
     async function onSubmit(data: FormFields) {
@@ -33,6 +33,7 @@ const JoinGameForm = ({params}: {params: {id: string}}) => {
             try {
                 const request = await joinRoom(user.access_token, params.id );
                 const response = request;
+                console.log(response)
                 if(response.status === 200){
                     router.push(`/game-room?roomId=${params.id}`)
                     setLoading(false)

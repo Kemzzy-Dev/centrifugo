@@ -41,7 +41,9 @@ const CreateGameRoom = () => {
         roomVersion,
         user.access_token
       );
-      const roomId = result.id;
+      const roomId = result.data.id;
+      console.log("Result of create game", result)
+      console.log("Game room id", result.data.id)
       
       router.push(`/join-game/${roomId}`);
     } catch (error) {

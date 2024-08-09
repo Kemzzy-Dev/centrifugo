@@ -44,9 +44,9 @@ const Login = ({ setLoginIsDisplayed }: { setLoginIsDisplayed: (value: boolean) 
           }
           setUser(context)
         //   console.log(context)
-        const redirectUrl = localStorage.getItem("redirectAfterLogin") || '/create-game-room'
+        const redirectUrl = '/create-game-room'
         console.log(redirectUrl)
-          router.replace(redirectUrl)
+          router.push(redirectUrl)
           setLoading(false)
         }else{
             setLoading(false)
