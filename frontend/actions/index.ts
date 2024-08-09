@@ -6,6 +6,11 @@ import { SendMessagePayload } from "@/types";
 export async function uploadImageToProvider(payload: any) {}
 
 const API_URL = appConfig.API_BASE_URL;
+const WEBSOCKET_URL = process.env.WEBSOCKET_URL
+
+export async function getWebsocketUrl() {
+  return WEBSOCKET_URL
+}
 
 export async function login(payload: LoginPayload): Promise<AuthResponseDto> {
   const request = await fetch(`${API_URL}/auth/login`, {

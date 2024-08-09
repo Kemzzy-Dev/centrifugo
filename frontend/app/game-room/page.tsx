@@ -16,6 +16,7 @@ import {
   getCentrifugeToken,
   getChannelSubscriptionToken,
   getRooms,
+  getWebsocketUrl,
   joinRoom,
   leaveRoom,
   sendMessage,
@@ -228,10 +229,12 @@ const GameRoom = ({
     processMessage();
   }, [messageQueue, chatStateHandler, roomId, showMessageBubble]);
 
-  useEffect(() => {
+  useEffect( () => {
     let centrifuge: Centrifuge | null = null;
+    
     const init = async () => {
-      centrifuge = new Centrifuge(`${appConfig.socketUrl}`, {
+      const socketUrl = (await getWebsocketUrl()) as string
+      centrifuge = new Centrifuge(socketUrl, {
         debug: true,
         getToken: getToken,
       });
