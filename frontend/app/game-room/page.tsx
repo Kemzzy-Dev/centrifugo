@@ -136,37 +136,7 @@ const GameRoom = ({
   useEffect(() => {
     setRoomId(searchParams.roomId)
   }, []);
-  class SocketManager {
-    public async processUserJoined(body: any) {
-      dispatch({
-        type: "JOIN_ROOM",
-        payload: {
-          roomId,
-          rooms: [body],
-        },
-      });
-    }
-
-    public async processUserLeft(body: any) {
-      dispatch({
-        type: "LEAVE_ROOM",
-        payload: {
-          roomId,
-          rooms: [body],
-        },
-      });
-    }
-
-    public async processNewMessage(body: any) {
-      dispatch({
-        type: "ADD_MESSAGES",
-        payload: {
-          roomId,
-          messages: [body],
-        },
-      });
-    }
-  }
+  
 
   function onPublication(publication: any) {
     const response = publication;
@@ -193,6 +163,38 @@ const GameRoom = ({
     if (messageQueue.length === 0) {
       return;
     }
+
+    class SocketManager {
+        public async processUserJoined(body: any) {
+          dispatch({
+            type: "JOIN_ROOM",
+            payload: {
+              roomId,
+              rooms: [body],
+            },
+          });
+        }
+    
+        public async processUserLeft(body: any) {
+          dispatch({
+            type: "LEAVE_ROOM",
+            payload: {
+              roomId,
+              rooms: [body],
+            },
+          });
+        }
+    
+        public async processNewMessage(body: any) {
+          dispatch({
+            type: "ADD_MESSAGES",
+            payload: {
+              roomId,
+              messages: [body],
+            },
+          });
+        }
+      }
 
     const MessageProcessor = new SocketManager();
 
@@ -224,7 +226,7 @@ const GameRoom = ({
     }
 
     processMessage();
-  }, [messageQueue, chatStateHandler]);
+  }, [messageQueue, chatStateHandler, roomId, showMessageBubble]);
 
   useEffect(() => {
     let centrifuge: Centrifuge | null = null;
@@ -370,6 +372,7 @@ const GameRoom = ({
             </button>
             <div className="absolute top-20 right-52"> {/* Position the buttons in the top right corner */}
             <button onClick={handleLeaveRoom} className='btn bg-red-400 rounded-sm px-3 py-2 text-white hover:bg-red-500'>Leave Game</button> {/* Leave Game button */}
+            
           </div>
           </div>
         )}

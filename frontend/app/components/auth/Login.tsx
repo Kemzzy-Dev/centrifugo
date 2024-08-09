@@ -43,8 +43,10 @@ const Login = ({ setLoginIsDisplayed }: { setLoginIsDisplayed: (value: boolean) 
             access_token: response.access_token,
           }
           setUser(context)
-        const redirectUrl = localStorage.getItem("redirectAfterLogin") || '/create-game-room'
-          router.replace(redirectUrl)
+        //   console.log(context)
+        const redirectUrl = '/create-game-room'
+        console.log(redirectUrl)
+          router.push(redirectUrl)
           setLoading(false)
         }else{
             setLoading(false)

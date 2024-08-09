@@ -45,11 +45,9 @@ export default function AuthContext({children} :Props) {
       }, []);
       
     useEffect(() => {
-        const authContext = localStorage.getItem('userContext')
-
-        if (!authContext) {
-            const currentUrl = window.location.href;
-            localStorage.setItem("redirectAfterLogin", currentUrl);
+        if (!user.access_token) {
+            // const currentUrl = window.location.href;
+            // localStorage.setItem("redirectAfterLogin", currentUrl);
             console.log("Missing token")
             router.push('/')
             return
