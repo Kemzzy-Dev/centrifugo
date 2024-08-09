@@ -14,7 +14,7 @@ export class RoomController {
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @HttpCode(200)
     async message(@Body() body: { title: string; version: number }): Promise<any> {
-      console.log(body);
+      
       return this.roomService.createRoom(body);
     }
 

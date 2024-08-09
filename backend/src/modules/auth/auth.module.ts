@@ -13,12 +13,15 @@ import { GoogleAuthService } from './google-auth.service';
 import Message from '../user/entities/message.entity';
 import { Room } from '../user/entities/room.entity';
 import { BroadcastService } from '../user/broadcast.service';
+import RoomService from './room.service';
+import { RoomController } from './room.controller';
+
 
 @Module({
-  controllers: [RegistrationController],
-  providers: [AuthenticationService, Repository, UserService, GoogleStrategy, GoogleAuthService, BroadcastService],
+  controllers: [RegistrationController,RoomController],
+  providers: [AuthenticationService, Repository, UserService, GoogleStrategy, GoogleAuthService, BroadcastService, RoomService],
   imports: [
-    TypeOrmModule.forFeature([User, Message, Room]),
+    TypeOrmModule.forFeature([User, Message, Room,]),
     PassportModule,
     JwtModule.register({
       global: true,
@@ -29,3 +32,7 @@ import { BroadcastService } from '../user/broadcast.service';
   exports: [],
 })
 export class AuthModule {}
+
+
+
+

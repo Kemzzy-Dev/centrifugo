@@ -33,7 +33,8 @@ import {
 
   
     public async createRoom(body: { title: string; version: number }) {
-      return await this.userService.createRoom(body);
+      const response = await this.userService.createRoom(body);
+      return {status_code: HttpStatus.CREATED,message: "Room created successfully", data:response }
     }
   
     public async getAllRooms() {

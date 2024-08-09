@@ -2,7 +2,7 @@
 
 import { createRoom, getCentrifugeToken } from "@/actions";
 import appConfig from "@/config/appConfig";
-import { useAuthContext } from "@/context/AuthContext";
+import { emptyContext, useAuthContext } from "@/context/AuthContext";
 import { Centrifuge } from "centrifuge";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
@@ -41,7 +41,13 @@ const CreateGameRoom = () => {
         roomVersion,
         user.access_token
       );
-      const roomId = result.id;
+      console.log(result)
+        if (result.status_code === 401) {
+          setUser(emptyContext)
+          router.push('/')
+        }
+      
+      const roomId = result.data.id;
       
       router.push(`/join-game/${roomId}`);
     } catch (error) {
