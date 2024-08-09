@@ -30,7 +30,6 @@ const JoinGameForm = ({params}: {params: {id: string}}) => {
         //route to game room
         setLoading(true)
         if(formIsValid){
-            sessionStorage.setItem('Joined', JSON.stringify(data.id))
             try {
                 const request = await joinRoom(user.access_token, params.id );
                 const response = request;
@@ -41,8 +40,9 @@ const JoinGameForm = ({params}: {params: {id: string}}) => {
             }catch (error: any) {
                 setErrMessage(error.message)
                 throw new Error(error.message)
+            } finally{
+                setLoading(false);
             }
-            // Also add uer to room in centrifugo and database
         }
     }
     return (

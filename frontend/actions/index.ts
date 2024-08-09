@@ -1,4 +1,4 @@
-"use client";
+"use server";
 
 import appConfig from "@/config/appConfig";
 import { SendMessagePayload } from "@/types";
