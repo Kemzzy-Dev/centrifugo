@@ -13,7 +13,7 @@ export class CreateUserDTO {
   @IsString()
   last_name: string;
 
-  @MinLength(8)
+  
   @IsNotEmpty()
   password: string;
 

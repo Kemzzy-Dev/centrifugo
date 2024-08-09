@@ -180,7 +180,7 @@ const GameRoom = ({
     const request = await getCentrifugeToken(user.access_token);
     if (request.status_code === 401) {
       setUser(emptyContext);
-      return "";
+      router.push('/')
     }
     if (request.status_code !== 200) {
       throw new Error("Error occured");
