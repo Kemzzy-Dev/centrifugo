@@ -41,7 +41,7 @@ const CreateGameRoom = () => {
         roomVersion,
         user.access_token
       );
-      console.log(result)
+      
         if (result.status_code === 401) {
           setUser(emptyContext)
           router.push('/')
